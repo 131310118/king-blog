@@ -86,7 +86,7 @@ function getWoff2(res, req, pathname) {
 }
 
 function getJs(res, req, pathname) {
-    serverStaticFile(res, pathname, 'text/javascript', 200);
+    serverStaticFile(res, '/js' + pathname, 'text/javascript', 200);
 }
 
 function upload(res, req) {
@@ -183,14 +183,14 @@ function checkLogin(res, req) {
         });
 
         req.on('end', function() {
-            console.log(alldata);
+           /* console.log(alldata);
             var dataString = alldata.toString();
             var dataObj = querystring.parse(dataString);
             if(!(dataObj.username&&dataObj.password)){
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end('{"status": 0, "log": "参数有误"}');
                 return;
-            }
+            }*/
             jwt.verify(req.headers.auth, 'womenzuiqiang', function(err, decode) {
                 if(decode.username == '123') {
                     res.writeHead(200, {'Content-Type': 'application/json'});
