@@ -21,6 +21,9 @@ gulp.task('include', function() {
                     .pipe(replace(/<!--script-select_on-->[\s\S]*<!--script-select_onend-->/, '<!--script-select_on-->\n'
                         + fs.readFileSync(htmlDir + '_select_on.html', 'utf-8') + '\n<!--script-select_onend-->'))
                     .pipe(gulp.dest(destDir))
+                    .pipe(replace(/<!--editor-->[\s\S]*<!--editorend-->/, '<!--editor-->\n'
+                        + fs.readFileSync(htmlDir + '_editor.html', 'utf-8') + '\n<!--editorend-->'))
+                    .pipe(gulp.dest(destDir))
             }));
         }
     });

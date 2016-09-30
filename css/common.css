@@ -94,7 +94,7 @@ input:focus {
     background-color: #fff;
     border: 1px solid #426a9a;
     outline: none;
-    color: #ddd;
+    color: #526b77;
     width:105px;
 }
 .nav-list .search:hover {
@@ -146,7 +146,9 @@ input:focus {
     margin:auto;
 }
 .main {
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
 }
 @media (max-width: 767px) {
     .nav-list {
@@ -159,7 +161,6 @@ input:focus {
     }
     .main {
         width: 700px;
-        margin: auto;
     }
     .nav-list > li a {
         padding: 0 14px;
@@ -172,7 +173,6 @@ input:focus {
     }
     .main {
         width: 800px;
-        margin: auto;
     }
     .search input {
         width:200px;
@@ -185,6 +185,5 @@ input:focus {
     }
     .main {
         width: 900px;
-        margin: auto;
     }
 }
