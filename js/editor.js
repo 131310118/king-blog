@@ -102,14 +102,15 @@ var KEStatus = {
         KEStatus.emptyList.length = 0;
     },
     //命令入口
-    execCommand:function(command){
+    execCommand:function(command, option){
         if(!KEStatus.range){
             kEMain.focus();
             KEStatus.saveCusorPos();
         }
         KEStatus.delEmptyList();
         KECommands['save']();
-        KECommands[command]();
+        KECommands[command](option);
+        KEStatus.select();
         KEStatus.initTools();
     },
     //去除子节点相同的节点
@@ -354,26 +355,31 @@ var KEStatus = {
         var html = e.clipboardData.getData('text/html');
         if(html){
             KECommands.save();
+            //屏蔽值
             var styleSheet = {
-                color:'rgb(0, 0, 0)',
-                'font-family':'Simsun',
-                'font-size':'medium',
-                'font-style':'normal',
-                'font-variant-ligatures':'normal',
-                'font-variant-caps':'normal',
-                'font-weight':'normal',
-                'letter-spacing':'normal',
-                'line-height':'normal',
-                orphans:'2',
-                'text-align':'start',
-                'text-indent':'0px',
-                'text-transform':'none',
-                'white-space':'normal',
-                widows:'2',
-                'word-spacing':'0px',
-                '-webkit-text-stroke-width':'0px',
-                float:'none',
-                display:'inline'
+                'color': 'rgb(0, 0, 0)',
+                /*'font-family': 'Simsun',*/
+                'font-size': 'medium',
+                'font-style': 'normal',
+                'font-variant-ligatures': 'normal',
+                'font-variant-caps': 'normal',
+                'font-weight': 'normal',
+                'letter-spacing': 'normal',
+                'line-height': 'normal',
+                'orphans': '2',
+                'text-align': 'start',
+                'text-indent': '0px',
+                'text-transform': 'none',
+                'white-space': 'normal',
+                'widows': '2',
+                'word-spacing': '0px',
+                '-webkit-text-stroke-width': '0px',
+                'float': 'none',
+                'display': 'inline'
+            };
+            //屏蔽属性
+            var styleSheetKey = {
+                'font-family': true
             };
             e.preventDefault();
             html = html.replace(/strong>/g,'b>');
@@ -395,7 +401,7 @@ var KEStatus = {
             if(!range.collapsed) {
                 range.extractContents();
             }
-            var end = span.lastChild;
+            //var end = span.lastChild;
             if(block) {
                 if(range.endContainer != kEMainContent) {
                     range.setEndAfter(KEStatus.getFatherP(range.endContainer));
@@ -403,23 +409,49 @@ var KEStatus = {
                     range.setEndAfter(kEMainContent.childNodes[range.endOffset]);
                 }
                 var bottom = range.extractContents();
-                while(span.lastChild) {
+                while(ele = span.lastChild) {
+                    var obj = document.createElement(ele.nodeName);
+                    obj.innerHTML = ele.innerHTML;
+                    if(!flag){
+                        flag = obj;
+                    }
+                    for(var key = 0;key < ele.style.length;key++){
+                        var t = ele.style[key], ts = ele.style[t];
+                        if(ts != styleSheet[t] && !styleSheetKey[t]){
+                            obj.style[t] = ts;
+                        }
+                    }
+                    span.removeChild(ele);
                     ele = span.lastChild;
-                    range.insertNode(ele);
+                    range.insertNode(obj);
                 }
                 var collrange = range.cloneRange();
                 collrange.collapse(false);
                 collrange.insertNode(bottom);
             } else {
                 while(ele = span.lastChild) {
-                    range.insertNode(ele);
+                    obj = document.createElement(ele.nodeName);
+                    obj.innerHTML = ele.innerHTML;
+                    if(!flag){
+                        flag = obj;
+                    }
+                    for(key=0;key<ele.style.length;key++){
+                        t = ele.style[key];
+                        ts = ele.style[t];
+                        if(ts != styleSheet[t] && !styleSheetKey[t]){
+                            obj.style[t] = ts;
+                        }
+                    }
+                    span.removeChild(ele);
+                    ele = span.lastChild;
+                    range.insertNode(obj);
                 }
             }
-            KEStatus.mergeEmpty(end);
-            KEStatus.mergeEmpty(ele);
-            var node = KEStatus.getRangeEndContainer(end);
+            KEStatus.mergeEmpty(flag);
+            KEStatus.mergeEmpty(obj);
+            var node = KEStatus.getRangeEndContainer(flag);
             range.setEnd(node, node.length);
-            range.setStart(KEStatus.getRangeStartContainer(ele), 0);
+            range.setStart(KEStatus.getRangeStartContainer(obj), 0);
             KEStatus.range = range;
             KEStatus.select();
             /*var block = KEStatus.isBlock(span),range;
@@ -491,7 +523,7 @@ var KEStatus = {
     }
 };
 var KECommands = {
-    execCommandTag:function(status,nodeName,option) {
+    execCommandTag: function(status, nodeName, option) {
         var b,obj,ec,range,length;
         if(!KEStatus.isMultiLine) {//单行操作
             if(!KEStatus.status[status].status) {//添加效果
@@ -502,7 +534,7 @@ var KECommands = {
                     KEStatus.emptyList.push(b.firstChild);
                     KEStatus.range.setEnd(b.firstChild,1);
                     KEStatus.range.collapse(false);
-                    KEStatus.select();
+                    //KEStatus.select();
                 } else {
                     /*
                     * <p>abc<i>【abc】</i>abc</p>单个标签首尾
@@ -523,7 +555,7 @@ var KECommands = {
                     KEStatus.range.setStart(KEStatus.getRangeStartContainer(b), 0);//恢复选中状态
                     obj = KEStatus.getRangeEndContainer(b);
                     KEStatus.range.setEnd(obj,obj.length);
-                    KEStatus.select();//选中
+                    //KEStatus.select();//选中
                     KEStatus.mergeParent(b);//若兄弟节点属同类标签将其合并
                 }
             } else{
@@ -601,7 +633,7 @@ var KECommands = {
                         node.parentNode.removeChild(node.previousSibling);
                     }
                     KEStatus.range.collapse(false);
-                    KEStatus.select();
+                    //KEStatus.select();
                 }else{
                     ec = range.extractContents();
                     b = tag(nodeName,option);
@@ -621,7 +653,7 @@ var KECommands = {
                     KEStatus.range.setStart(KEStatus.getRangeStartContainer(obj),0);
                     obj = KEStatus.getRangeEndContainer(node.previousSibling);
                     KEStatus.range.setEnd(obj,obj.length);
-                    KEStatus.select();
+                    //KEStatus.select();
                 }
                 //截取中间部分-end
                 while(node.childNodes.length&&node.firstChild.nodeType==3&&(node.firstChild.data=="​"||node.firstChild.data=='')){
@@ -636,10 +668,10 @@ var KECommands = {
             if(!KEStatus.status[status].status){
                 while(true){
                     var rg = KEStatus.range.cloneRange();
-                    if(s!=KEStatus.isMultiLine.start){
+                    if(s != KEStatus.isMultiLine.start){
                         rg.setStart(s,0);
                     }
-                    if(s!=e){
+                    if(s !=e ){
                         rg.setEndAfter(s.lastChild);
                         b = tag(nodeName,option);
                         b.appendChild(rg.extractContents());
@@ -661,10 +693,10 @@ var KECommands = {
                     }
                     s = s.nextSibling;
                 }
-                KEStatus.select();
+                //KEStatus.select();
             }else{
                 while(true){
-                    var rg = KEStatus.range.cloneRange();
+                    rg = KEStatus.range.cloneRange();
                     if(s==KEStatus.isMultiLine.start){
                         rg.setEndAfter(s);
                         b = rg.extractContents();
@@ -701,7 +733,7 @@ var KECommands = {
                         b = KEStatus.getRangeEndContainer(obj);
                         KEStatus.range.setEnd(b, b.length);
                         KEStatus.mergeEmpty(obj);
-                        KEStatus.select();
+                        //KEStatus.select();
                         break;
                     }
                     s = s.nextSibling;
@@ -716,29 +748,64 @@ var KECommands = {
             return ele;
         }
     },
-    Bold:function(){
-        KECommands.execCommandTag('isBold','b');
+    execCommandBlock: function(option) {
+        if(!KEStatus.isMultiLine) {
+            var node = KEStatus.range.startContainer;
+            while(node.nodeName != 'P') {
+                node = node.parentNode;
+            }
+            KEStatus.updateObject(option,node);
+           /* for(var key in option) {
+                for(var name in option[key]) {
+                    node[key][name] = option[key][name];
+                }
+            }*/
+        } else {
+            var s = KEStatus.isMultiLine.start,e = KEStatus.isMultiLine.end;
+            while(s != e) {
+                /*for(key in option) {
+                    for(name in option[key]) {
+                        s[key][name] = option[key][name];
+                    }
+                }*/
+                KEStatus.updateObject(option,s);
+                s = s.nextSibling;
+            }
+            /*for(key in option) {
+                for(name in option[key]) {
+                    s[key][name] = option[key][name];
+                }
+            }*/
+            KEStatus.updateObject(option,s);
+        }
+        //KEStatus.select();
     },
-    Italic:function(){
+    Bold: function() {
+        KECommands.execCommandTag('isBold', 'b');
+    },
+    Italic: function() {
         KECommands.execCommandTag('isItalic','i');
     },
-    Underline:function(){
+    Underline: function() {
         KECommands.execCommandTag('isUnderline','u');
     },
-    Border:function(){
-        KECommands.execCommandTag('isBorder','span',{style:{border:'1px solid rgb(0, 0, 0)'}});
+    Border: function() {
+        KECommands.execCommandTag('isBorder','span',{style:{border: '1px solid rgb(0, 0, 0)'}});
     },
-    save:function(){
+    LineHeight: function(em) {
+        KECommands.execCommandBlock({style:{'line-height': em + 'em'}});
+    },
+    save: function(){
         KEStatus.redoList = [];
         KEStatus.saveWork(KEStatus.list);
     },
-    undo:function(){
+    undo: function(){
         if(KEStatus.list.length){
             KEStatus.saveWork(KEStatus.redoList);
             KEStatus.setWork(KEStatus.list);
         }
     },
-    redo:function(){
+    redo: function(){
         if(KEStatus.redoList.length){
             KEStatus.saveWork(KEStatus.list);
             KEStatus.setWork(KEStatus.redoList);
@@ -810,7 +877,7 @@ kETools.onclick = function(e){
             KEStatus.execCommand( 'Border');
             break;
         case 'kETool_LHL':
-            KEStatus.execCommand( 'LineHeight');
+            KEStatus.execCommand( 'LineHeight', KEObject.kETool_LHDown.getElementsByClassName('on')[0].innerText);
             break;
         case 'kETool_p':
             if(!KEStatus.range){
@@ -974,6 +1041,6 @@ KEObject.kETool_LHDown.addEventListener('click',function(e){
         tar.className = 'option on';
         this.className = 'kETool_LHDown';
         var em = tar.innerText;
-        KEStatus.setLineHeight(em);
+        KEStatus.execCommand('LineHeight', em);
     }
 });

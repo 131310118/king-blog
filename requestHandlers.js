@@ -51,11 +51,17 @@ function getIco(res, req, pathname) {
     serverStaticFile(res, pathname, 'image/x-icon', 200);
 }
 
-function getPng(res, req, pathname) {
+function getPng(res, req, pathname, file) {
     console.log('Request handler "start" was called.');
 
-    serverStaticFile(res, '/img' + pathname, 'image/png', 200);
+    serverStaticFile(res, '/img' + pathname, 'image/' + file, 200);
 }
+
+/*function getGif(res, req, pathname, file) {
+    console.log('Request handler "start" was called.');
+
+    serverStaticFile(res, '/img' + pathname, 'image/' + file, 200);
+}*/
 
 function getCss(res, req, pathname) {
     serverStaticFile(res, '/css' + pathname, 'text/css', 200);
@@ -211,6 +217,7 @@ exports.upload = upload;
 exports.show = show;
 exports.getIco = getIco;
 exports.getPng = getPng;
+/*exports.getGif = getGif;*/
 exports.getCss = getCss;
 exports.getOtf = getOtf;
 exports.getEot = getEot;
