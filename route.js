@@ -27,7 +27,13 @@ handle['/checkLogin'] = requestHandlers.checkLogin;
 
 function route(pathname, res, req){
     console.log('About to route a request for ' + pathname);
-    var file = pathname.match(/\.(\w+)$/)[1]||pathname;
+    var roat = pathname.match(/\.(\w+)$/);
+    if(roat) {
+        var file = pathname.match(/\.(\w+)$/)[1]||pathname;
+    } else {
+        file = pathname;
+    }
+    //var file = pathname.match(/\.(\w+)$/)[1]||pathname;
     if(file instanceof Array){
         file = file[0];
     }

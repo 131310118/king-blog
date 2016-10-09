@@ -97,16 +97,13 @@ function getJs(res, req, pathname) {
 
 function upload(res, req) {
     console.log('Request handler "upload" was called.');
-
     var form = new formidable.IncomingForm();
     console.log('about to parse');
     form.parse(req, function(error, fields, files) {
-        console.log('parsing done');
-        fs.renameSync(files.upload.path, '/root/img/test.png');
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write('received image:<br/>');
-        res.write('<img src="/show"/>');
-        res.end();
+        console.log('parsing done\n'+files.file.path);
+        fs.renameSync(files.file.path, '/root/img/test.jpg');
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end('{"status": 1, "log": "上传成功"}');
     })
 }
 

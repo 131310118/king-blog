@@ -206,3 +206,18 @@
 #kingEditor #kETool_border{
 	background-position: -160px -40px;
 }
+#kingEditor #kETool_color {
+	width: 26px;
+}
+#kETool_FC {
+	height: 20px;
+	position: relative;
+}
+.kETool_CColor {
+	position: absolute;
+	width: 5px;
+	height: 13px;
+	right: 0;
+	top: 3px;
+	background-color: #444;
+}

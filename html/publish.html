@@ -10,6 +10,10 @@
         .blog {
             border-top: 1px solid #d4d4d4;
         }
+        .blog_controls {
+            margin: 10px 0;
+            line-height: 35px;
+        }
     </style>
 </head>
 <body data-on="home">
@@ -23,9 +27,46 @@
             <h3><span class="required">*</span>笔记正文</h3>
             <!--editor--><!--editorend-->
         </section>
+        <div class="blog_controls">
+            <a class="save btn">保存笔记</a>
+        </div>
     </div>
 </section>
 </body>
 <!--script-select_on--><!--script-select_onend-->
 <script type="text/javascript" src="/editor.js"></script>
+<script type="text/javascript">
+    var save = document.getElementsByClassName('save')[0];
+    save.onclick = function() {
+        var content = document.getElementById('kEMainContent');
+        var submitCon = content.cloneNode();
+        filterClone(submitCon,content);
+        console.log(submitCon);
+    };
+    function filterClone(des, source) {
+        var node = source.firstChild;
+        while(node) {
+            if(node.nodeName != '#text') {
+                var n = document.createElement(node.nodeName);
+                if(node.style.length) {
+                    for(var i = 0; i < node.style.length; i++) {
+                        n.style[node.style[i]] = node.style[node.style[i]];
+                    }
+                }
+                switch(node.nodeName) {
+                    case 'IMG':
+                        if(node.title) {
+                            n.title = node.title;
+                        }
+                        break;
+                }
+                des.appendChild(n);
+                filterClone(n, node);
+            } else {
+                des.appendChild(document.createTextNode(node.nodeValue));
+            }
+            node = node.nextSibling;
+        }
+    }
+</script>
 </html>

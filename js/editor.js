@@ -415,7 +415,7 @@ var KEStatus = {
                     if(!flag){
                         flag = obj;
                     }
-                    for(var key = 0;key < ele.style.length;key++){
+                    for(var key = 0; key < ele.style.length; key++){
                         var t = ele.style[key], ts = ele.style[t];
                         if(ts != styleSheet[t] && !styleSheetKey[t]){
                             obj.style[t] = ts;
@@ -837,10 +837,11 @@ kEMain.onblur = function(){
 //内容为空无法删除-start
 kEMain.addEventListener('keydown',function(e){
     if(e.keyCode==8){
-        if(kEMainContent.childNodes[0].innerHTML=='<br>'){
+        if(kEMainContent.childNodes[0].innerHTML=='<br>' && kEMainContent.childNodes.length < 3){
             e.preventDefault();
             e.stopPropagation();
         }
+//内容为空无法删除-end
     }else if(e.keyCode==90){
         event.preventDefault();
         KECommands['undo']();
@@ -851,7 +852,6 @@ kEMain.addEventListener('keydown',function(e){
         KECommands['copy']();
     }*/
 });
-//内容为空无法删除-end
 kEMain.onpaste = function(e){
     KEStatus.paste(e);
 };
@@ -924,6 +924,20 @@ kETool_img.addEventListener('change',function(){
     KEStatus.range.setEndAfter(img);
     st = KEStatus.selection;
     r = KEStatus.range;
+    var form = new FormData();
+    form.append("file", document.getElementById('kETool_img').files[0]);
+    var xhr = new XMLHttpRequest();
+    xhr.open('post', '/upload', true);
+    xhr.send(form);
+    xhr.onreadystatechange = function () {
+        if(xhr.readyState == 4) {
+            if(xhr.status == 200) {
+                console.log(1+data);
+            } else {
+                console.log(0);
+            }
+        }
+    };
     //document.execCommand("inserthtml",'<img src=\"\" id=\"load\"/>');
     //KEStatus.saveCusorPos();
     //me.execCommand('inserthtml', '<img class="loadingclass" id="' + loadingId + '" src="' + me.options.themePath + me.options.theme +'/images/spacer.gif" title="' + (me.getLang('simpleupload.loading') || '') + '" >');
