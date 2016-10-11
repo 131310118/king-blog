@@ -3,6 +3,7 @@
  */
 
 var querystring = require('querystring');
+var url = require('url');
 var mongo = require('./mongo');
 var md5 = require('./md5');
 var fs = require('fs');
@@ -98,13 +99,79 @@ function getJs(res, req, pathname) {
 function upload(res, req) {
     console.log('Request handler "upload" was called.');
     var form = new formidable.IncomingForm();
+    form.uploadDir = '/root/myblog/img';
+    form.keepExtensions = true;	 //保留后缀
     console.log('about to parse');
     form.parse(req, function(error, fields, files) {
         console.log('parsing done\n'+files.file.path);
-        fs.renameSync(files.file.path, '/root/img/test.jpg');
+        var name = files.file.path.match(/upload_(.*)/)[1];
+        /*var extName = '';  //后缀名
+        switch (files.file.type) {
+            case 'image/pjpeg':
+                extName = '.jpg';
+                break;
+            case 'image/jpeg':
+                extName = '.jpg';
+                break;
+            case 'image/png':
+                extName = '.png';
+                break;
+            case 'image/x-png':
+                extName = '.png';
+                break;
+        }*/
+        fs.renameSync(files.file.path, '/root/myblog/img/' + name/* + extName*/);
         res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end('{"status": 1, "log": "上传成功"}');
+        res.end('{"url": "' + name + '"}');
     })
+}
+
+function publish(res, req) {
+    if(req.method.toLowerCase() === 'post') {
+        var alldata = '';
+        req.on('data', function(chunk) {
+            alldata += chunk;
+        });
+
+        req.on('end', function() {
+            check(req, {
+                callback: function(user) {
+                    console.log(alldata);
+                    var dataString = alldata.toString();
+                    var dataObj = querystring.parse(dataString);
+                    if(dataObj.title
+                        && dataObj.title.length
+                        && dataObj.content
+                        && dataObj.content.length
+                        && (dataObj.imgs.length
+                        || (dataObj.summary && dataObj.summary.length))
+                    ) {
+                        var title = dataObj.title;
+                        var content = dataObj.content;
+                        var imgs = dataObj.imgs;
+                        var summary = dataObj.summary
+                    } else {
+                        res.writeHead(200, {'Content-Type': 'application/json'});
+                        res.end('{"status": 0, "log": "参数有误"}');
+                        return;
+                    }
+                    mongo.publishBlog({
+                        title: title,
+                        content: content,
+                        imgs: imgs,
+                        summary: summary
+                    }, user, res, function() {
+                        res.writeHead(200, {'Content-Type': 'application/json'});
+                        res.end('{"status": 1, "log": "保存成功"}');
+                    });
+                },
+                error: function() {
+                    res.writeHead(200, {'Content-Type': 'application/json'});
+                    res.end('{"status": 0, "log": "没有权限"}');
+                }
+            });
+        })
+    }
 }
 
 function registed(res, req, pathname) {
@@ -194,19 +261,59 @@ function checkLogin(res, req) {
                 res.end('{"status": 0, "log": "参数有误"}');
                 return;
             }*/
-            jwt.verify(req.headers.auth, 'womenzuiqiang', function(err, decode) {
+            check(req, {
+                callback: function() {
+                    res.writeHead(200, {'Content-Type': 'application/json'});
+                    res.end('{"status": 1, "log": "验证成功"}');
+                },
+                error: function() {
+                    res.writeHead(200, {'Content-Type': 'application/json'});
+                    res.end('{"status": 0, "log": "验证失败"}');
+                }
+            });
+            /*jwt.verify(req.headers.auth, 'womenzuiqiang', function(err, decode) {
                 if(decode.username == '123') {
                     res.writeHead(200, {'Content-Type': 'application/json'});
                     res.end('{"status": 1, "log": "验证成功"}');
                 }
-            })
+            })*/
         })
     }
+}
+
+function check(req, option) {
+    jwt.verify(req.headers.auth, 'womenzuiqiang', function(err, decode) {
+        if(decode.username && decode.username == '123') {
+            option.callback(decode.username);
+        } else {
+            option.error();
+        }
+    })
 }
 
 function show(res) {
     console.log('Request handle "show" was called.');
     serverStaticFile(res, '/img/test.png', 'text/html', 200);
+}
+
+function getBlogs(res, req) {
+    var dataObj = querystring.parse(url.parse(req.url.query));
+    var data = {
+        author: dataObj.author,
+        page: dataObj.page
+    };
+    if(data.author == null || data.page == null) {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end('{"status": 0, "log": "参数有误"}');
+        return;
+    }
+    mongo.getBlogs(res, data, {
+        success: function(data) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(data);
+        },
+        error: function() {}
+    })
 }
 
 exports.start = start;
@@ -226,3 +333,5 @@ exports.registed = registed;
 exports.login = login;
 exports.getJs = getJs;
 exports.checkLogin = checkLogin;
+exports.publish = publish;
+exports.getBlogs = getBlogs;

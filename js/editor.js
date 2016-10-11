@@ -918,7 +918,7 @@ kETool_img.addEventListener('change',function(){
         KEStatus.range = r;
         KEStatus.setFocus();
     };
-    img.setAttribute('id','image');
+    //img.setAttribute('id','image');
     KEStatus.range.insertNode(img);
     KEStatus.range.setStartAfter(img);
     KEStatus.range.setEndAfter(img);
@@ -932,16 +932,33 @@ kETool_img.addEventListener('change',function(){
     xhr.onreadystatechange = function () {
         if(xhr.readyState == 4) {
             if(xhr.status == 200) {
-                console.log(1+data);
+                var res = JSON.parse(xhr.response);
+                img.src = res.url;
+                img.onclick = function(){
+                    KEStatus.range.selectNode(img);
+                    KEStatus.modifyImg = img;
+                    KEStatus.setFocus();
+                    modifyImg.removeEventListener('click',s);
+                    focusImg.removeEventListener('click',n);
+                    modifyImg.style.left = img.offsetLeft+'px';
+                    modifyImg.style.top = (img.offsetTop-kEMainContent.scrollTop)+'px';
+                    modifyImg.style.width = img.clientWidth+'px';
+                    modifyImg.style.height = img.clientHeight+'px';
+                    focusImg.style.display = 'block';
+                    modifyImg.addEventListener('click',s);
+                    focusImg.addEventListener('click',n);
+                };
+                console.log(res.url);
             } else {
                 console.log(0);
+                img.parentNode.removeChild(img);
             }
         }
     };
     //document.execCommand("inserthtml",'<img src=\"\" id=\"load\"/>');
     //KEStatus.saveCusorPos();
     //me.execCommand('inserthtml', '<img class="loadingclass" id="' + loadingId + '" src="' + me.options.themePath + me.options.theme +'/images/spacer.gif" title="' + (me.getLang('simpleupload.loading') || '') + '" >');
-    if(typeof FileReader != 'undefined'){
+   /* if(typeof FileReader != 'undefined'){
         var acceptedTypes = {
             'image/png':true,
             'image/jpeg':true,
@@ -970,7 +987,7 @@ kETool_img.addEventListener('change',function(){
             };
             reader.readAsDataURL(document.getElementById('kETool_img').files[0]);
         }
-    }
+    }*/
 });
 modifyImg.addEventListener('mousedown',function(e){
     KEStatus.isImgDown = true;

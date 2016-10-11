@@ -23,27 +23,58 @@
         <h1>发布笔记</h1>
         <section class="blog">
             <h3><span class="required">*</span>笔记标题</h3>
-            <input type="text">
+            <input type="text" id="title">
             <h3><span class="required">*</span>笔记正文</h3>
             <!--editor--><!--editorend-->
         </section>
         <div class="blog_controls">
-            <a class="save btn">保存笔记</a>
+            <a class="save btn" href="javascript:void(0);">保存笔记</a>
         </div>
     </div>
 </section>
 </body>
 <!--script-select_on--><!--script-select_onend-->
 <script type="text/javascript" src="/editor.js"></script>
+<script type="text/javascript" src="/common.js"></script>
 <script type="text/javascript">
     var save = document.getElementsByClassName('save')[0];
     save.onclick = function() {
         var content = document.getElementById('kEMainContent');
         var submitCon = content.cloneNode();
-        filterClone(submitCon,content);
-        console.log(submitCon);
+        filterClone(submitCon, content);
+        var images = submitCon.getElementsByTagName('img');
+        var imgs = [];
+        for(var i = 0; i < 3 && i < images.length; i++) {
+            imgs[i] = images[i].getAttribute('src');
+        }
+        imgs = imgs.join('","');
+        imgs = '["' + imgs + '"]';
+        console.log(submitCon.innerHTML);
+        xhr.ajax({
+            type: 'post',
+            data: {
+                title: document.getElementById('title').value,
+                content: encodeURIComponent(submitCon.innerHTML),
+                imgs: imgs,
+                summary: encodeURIComponent(submitCon.innerHTML.replace(/<img[^>]*>/g, '').substring(0, 300))
+            },
+            url: '/publish',
+            dataType: 'json',
+            header: {
+                Auth: cookie.getCookie('auth')
+            },
+            success: function(data) {
+                console.log(data);
+            },
+            error: function() {
+                console.log('保存失败');
+            }
+        })
     };
     function filterClone(des, source) {
+        var filter = {
+            img: ['alt', 'title', 'src']
+        };
         var node = source.firstChild;
         while(node) {
             if(node.nodeName != '#text') {
@@ -55,8 +86,11 @@
                 }
                 switch(node.nodeName) {
                     case 'IMG':
-                        if(node.title) {
-                            n.title = node.title;
+                        for(var attribute in filter['img']) {
+                            var value = node.getAttribute(filter['img'][attribute]);
+                            if(value != null) {
+                                n.setAttribute(filter['img'][attribute], value);
+                            }
                         }
                         break;
                 }

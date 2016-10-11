@@ -21,4 +21,22 @@
 <!--header--><!--headerend-->
 </body>
 <!--script-select_on--><!--script-select_onend-->
+<script type="text/javascript" src="/common.js"></script>
+<script>
+    xhr.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/blogs',
+        data: {
+            author: '123',
+            page: 1
+        },
+        success: function(data) {
+            console.log(data);
+        },
+        error: function() {
+            console.log(0);
+        }
+    })
+</script>
 </html>

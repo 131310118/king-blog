@@ -8,7 +8,7 @@ handle['js'] = requestHandlers.getJs;
 handle['css'] = requestHandlers.getCss;
 handle['html'] = requestHandlers.start;
 handle['png'] = requestHandlers.getPng;
-handle['jpg'] = requestHandlers.start;
+handle['jpg'] = requestHandlers.getPng;
 handle['gif'] = requestHandlers.getPng;
 handle['ico'] = requestHandlers.getIco;
 handle['otf'] = requestHandlers.getOtf;
@@ -24,6 +24,8 @@ handle['/index'] = requestHandlers.start;
 handle['/upload'] = requestHandlers.upload;
 handle['/show'] = requestHandlers.show;
 handle['/checkLogin'] = requestHandlers.checkLogin;
+handle['/publish'] = requestHandlers.publish;
+handle['/blogs'] = requestHandlers.getBlogs;
 
 function route(pathname, res, req){
     console.log('About to route a request for ' + pathname);
