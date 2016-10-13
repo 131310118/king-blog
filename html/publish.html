@@ -39,6 +39,10 @@
 <script type="text/javascript">
     var save = document.getElementsByClassName('save')[0];
     save.onclick = function() {
+        var author = cookie.getCookie('auth');
+        if(!author) {
+            return;
+        }
         var content = document.getElementById('kEMainContent');
         var submitCon = content.cloneNode();
         filterClone(submitCon, content);
@@ -47,21 +51,25 @@
         for(var i = 0; i < 3 && i < images.length; i++) {
             imgs[i] = images[i].getAttribute('src');
         }
-        imgs = imgs.join('","');
-        imgs = '["' + imgs + '"]';
+       /* imgs = imgs.join('","');
+        imgs = '["' + imgs + '"]';*/
+        //imgs = JSON.stringify(imgs);
+       /* for(var i=0;i<imgs.length;i++){
+            data["imgs[]"]=imgs[i]
+        }*/
         console.log(submitCon.innerHTML);
         xhr.ajax({
             type: 'post',
             data: {
-                title: document.getElementById('title').value,
-                content: encodeURIComponent(submitCon.innerHTML),
-                imgs: imgs,
-                summary: encodeURIComponent(submitCon.innerHTML.replace(/<img[^>]*>/g, '').substring(0, 300))
+                "title": document.getElementById('title').value,
+                "content": encodeURIComponent(submitCon.innerHTML),
+                "imgs[]": imgs,
+                "summary": encodeURIComponent(submitCon.innerHTML.replace(/<img[^>]*>/g, '').substring(0, 300))
             },
             url: '/publish',
             dataType: 'json',
             header: {
-                Auth: cookie.getCookie('auth')
+                Auth: author
             },
             success: function(data) {
                 console.log(data);

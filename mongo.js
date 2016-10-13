@@ -67,22 +67,86 @@ function publishBlog(data, user, res, callback) {
         })
     });
 }
-function getBlogs(res, data, callback) {
+function getBlogsSummary(res, data, callback) {
+    var totalPage = 0;
+    var limit = 10;
     myDB.collection(data.author + 'Blog', function(err, collection) {
-        collection.find().exec(function(err, items) {
-            var limit = 10;
+        collection.find({}, function(err, items) {
+            items.count(true, function(err, total) {
+                totalPage = Math.floor(total / limit);
+                if(total % limit != 0) {
+                    totalPage++;
+                }
+                var currentPage = data.page > totalPage?totalPage:data.page;
+                console.log('totalPage: ' + totalPage + '\nlimit: ' + limit + '\ncurrentPage: ' + currentPage + '\nskip: ' + Math.floor(currentPage - 1) * limit);
+                collection.find({}, {"title": 1, "summary": 1, "imgs": 1, "publish_time": 1, "author": 1})
+                    .limit(limit)
+                    .skip(Math.floor(currentPage - 1) * limit)
+                    .toArray(function(err, results) {
+                        console.log('result: ' + results);
+                        var jsonArray = {
+                            totalPage: totalPage,
+                            limit: limit,
+                            data: results
+                        };
+                        callback.success(JSON.stringify(jsonArray));
+                    });
+            });
+            /*total = items.length;
+            totalPage = Math.floor(total / limit);
+            if(total % limit != 0) {
+                totalPage++;
+            }
+            var currentPage = data.page > totalPage?totalPage:data.page;
+            console.log('totalPage: ' + totalPage + '\nlimit: ' + limit + '\ncurrentPage: ' + currentPage + '\nskip: ' + Math.floor(currentPage - 1) * limit);
+            collection.find({}, {"title": 1, "summary": 1, "imgs": 1, "publish_time": 1, "author": 1})
+                .limit(limit)
+                .skip(Math.floor(currentPage - 1) * limit)
+                .toArray(function(err, results) {
+                    console.log('result: ' + results);
+                    var jsonArray = {
+                        totalPage: totalPage,
+                        limit: limit,
+                        data: results
+                    };
+                    callback.success(JSON.stringify(jsonArray));
+                });*/
+        });
+      /*  collection.count(function(err, count) {
+            total = count;
+        });
+        console.log("count: " + count);
+        totalPage = Math.floor(total / limit);
+        if(total % limit != 0) {
+            totalPage++;
+        }*/
+        /*var currentPage = data.page > totalPage?totalPage:data.page;
+        console.log('totalPage: ' + totalPage + '\nlimit: ' + limit + '\ncurrentPage: ' + currentPage + '\nskip: ' + Math.floor(currentPage - 1) * limit);
+        collection.find(/!*{}, {"title": 1, "summary": 1, "imgs": 1, "publish_time": 1, "author": 1}*!/)
+            .limit(limit)
+            .skip(Math.floor(currentPage - 1) * limit)
+            .toArray(function(err, results) {
+                console.log('result: ' + results);
+                var jsonArray = {
+                    totalPage: totalPage,
+                    limit: limit,
+                    data: results
+                };
+                callback.success(JSON.stringify(jsonArray));
+            });*/
+     /*   collection.find().exec(function(err, items) {
             var currentPage = data.page;
             if(err) {
                 callback.error();
             } else {
-                var totalPage = Math.floor(items.length / limit);
+                var totalPage = Math.floor(count / limit);
                 if(items.length % limit != 0) {
                     totalPage++;
                 }
                 if(data.page > totalPage) {
                     currentPage = totalPage;
                 }
-                var query = collection.find();
+                var query = collection.find({}, {"title": 1, "summary": 1, "imgs": 1, "publish_time": 1, "author": 1});
                 query.skip((currentPage - 1) * limit);
                 query.limit(limit);
                 query.exec(function(err, result) {
@@ -91,10 +155,10 @@ function getBlogs(res, data, callback) {
                         limit: limit,
                         data: result
                     };
-                    callback.succes(jsonArray);
+                    callback.success(jsonArray);
                 })
             }
-        })
+        })*/
     })
 }
 function closeDB(collection) {
@@ -103,7 +167,7 @@ function closeDB(collection) {
 
 exports.connectDB = connectDB;
 exports.addUser = addUser;
+exports.publishBlog = publishBlog;
 exports.getSalt = getSalt;
 exports.getPassword = getPassword;
-exports.publishBlog = publishBlog;
-exports.getBlogs = getBlogs;
+exports.getBlogsSummary = getBlogsSummary;

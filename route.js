@@ -25,7 +25,7 @@ handle['/upload'] = requestHandlers.upload;
 handle['/show'] = requestHandlers.show;
 handle['/checkLogin'] = requestHandlers.checkLogin;
 handle['/publish'] = requestHandlers.publish;
-handle['/blogs'] = requestHandlers.getBlogs;
+handle['/blogs'] = requestHandlers.getBlogsSummary;
 
 function route(pathname, res, req){
     console.log('About to route a request for ' + pathname);

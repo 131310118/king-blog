@@ -15,14 +15,146 @@
             box-sizing: border-box;
             outline: 0;
         }
+        .article {
+            margin: 50px 0;
+        }
+        .article-meta:before,
+        .article-meta:after {
+            content: "";
+            display: table;
+        }
+        .article-meta:after {
+            clear: both;
+        }
+        .article-date {
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #999;
+            margin-bottom: 1em;
+            margin-left: 5px;
+            line-height: 1em;
+            text-shadow: 0 1px #fff;
+            font-weight: bold;
+        }
+        .article-date {
+            float: left;
+        }
+        .article-inner {
+            background: #fff;
+            -webkit-box-shadow: 1px 2px 3px #ddd;
+            box-shadow: 1px 2px 3px #ddd;
+            border: 1px solid #ddd;
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .article-header {
+            padding: 20px 20px 0;
+        }
+        .article-title {
+            text-decoration: none;
+            font-size: 2em;
+            font-weight: bold;
+            color: #555;
+            line-height: 1.1em;
+            -webkit-transition: color 0.2s;
+            -moz-transition: color 0.2s;
+            -ms-transition: color 0.2s;
+            transition: color 0.2s;
+        }
+        a.article-title:hover {
+            color: #258fb8;
+        }
+        .article-entry {
+            color: #555;
+            padding: 0 20px;
+        }
+        .article-entry:before,
+        .article-entry:after {
+            content: "";
+            display: table;
+        }
+        .article-entry:after {
+            clear: both;
+        }
+        .article-more-link a {
+            display: inline-block;
+            line-height: 1em;
+            padding: 6px 15px;
+            -webkit-border-radius: 15px;
+            border-radius: 15px;
+            background: #eee;
+            color: #999;
+            text-shadow: 0 1px #fff;
+            text-decoration: none;
+        }
+        .article-more-link a:hover {
+            background: #258fb8;
+            color: #fff;
+            text-decoration: none;
+            text-shadow: 0 1px #1e7293;
+        }
+        .article-footer {
+            font-size: 1.15em;
+            line-height: 1.6em;
+            border-top: 1px solid #ddd;
+            padding-top: 0.6em;
+            margin: 0 20px 20px;
+        }
+        .article-footer:before,
+        .article-footer:after {
+            content: "";
+            display: table;
+        }
+        .article-footer:after {
+            clear: both;
+        }
+        .article-footer a {
+            color: #999;
+            text-decoration: none;
+        }
+        .article-footer a:hover {
+            color: #555;
+        }
+        .author-icon:before {
+            content: '\f007';
+        }
     </style>
 </head>
 <body data-on="home">
 <!--header--><!--headerend-->
+<div class="content">
+    <div class="container" id="articals">
+        <article class="article">
+            <div class="article-meta">
+                <a href="" class="article-date">
+                    <time>2016-09-29</time>
+                </a>
+            </div>
+            <div class="article-inner">
+                <header class="article-header">
+                    <h1>
+                        <a class="article-title" href="">Flink如何用窗格来优化窗口</a>
+                    </h1>
+                </header>
+                <div class="article-entry">
+                    <p>对于处理时间类型的窗口（包含了翻滚窗口和滑动窗口），Flink会使用称之为”pane”的技术来优化这类时间窗口的计算。</p>
+                    <p class="article-more-link">
+                        <a href="">Read More</a>
+                    </p>
+                </div>
+                <footer class="article-footer">
+                    <span class="author"><i class="fa author-icon"></i> 123</span>
+                </footer>
+            </div>
+        </article>
+    </div>
+</div>
 </body>
 <!--script-select_on--><!--script-select_onend-->
-<script type="text/javascript" src="/common.js"></script>
-<script>
+<script type="text/javascript" src="/common.js" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8">
     xhr.ajax({
         type: 'get',
         dataType: 'json',
@@ -32,11 +164,38 @@
             page: 1
         },
         success: function(data) {
-            console.log(data);
+            //console.log(data);
+            var articals = document.getElementById('articals');
+            var str = '';
+            for(var item in data.data) {
+                str += '<article class="article">\
+                        <div class="article-meta">\
+                        <a href="" class="article-date">\
+                        <time>2016-09-29</time>\
+                        </a>\
+                        </div>\
+                        <div class="article-inner">\
+                        <header class="article-header">\
+                        <h1>\
+                        <a class="article-title" href="">Flink如何用窗格来优化窗口</a>\
+                        </h1>\
+                        </header>\
+                        <div class="article-entry">\
+                        <p>对于处理时间类型的窗口（包含了翻滚窗口和滑动窗口），Flink会使用称之为”pane”的技术来优化这类时间窗口的计算。</p>\
+                <p class="article-more-link">\
+                    <a href="">Read More</a>\
+                    </p>\
+                    </div>\
+                    <footer class="article-footer">\
+                    <span class="author"><i></i>123</span>\
+                    </footer>\
+                    </div>\
+                    </article>'
+            }
         },
         error: function() {
             console.log(0);
         }
-    })
+    });
 </script>
 </html>

@@ -143,12 +143,12 @@ function publish(res, req) {
                         && dataObj.title.length
                         && dataObj.content
                         && dataObj.content.length
-                        && (dataObj.imgs.length
+                        && (dataObj["imgs[]"].length
                         || (dataObj.summary && dataObj.summary.length))
                     ) {
                         var title = dataObj.title;
                         var content = dataObj.content;
-                        var imgs = dataObj.imgs;
+                        var imgs = dataObj["imgs[]"];
                         var summary = dataObj.summary
                     } else {
                         res.writeHead(200, {'Content-Type': 'application/json'});
@@ -159,7 +159,9 @@ function publish(res, req) {
                         title: title,
                         content: content,
                         imgs: imgs,
-                        summary: summary
+                        summary: summary,
+                        publish_time: new Date()*1,
+                        author: user
                     }, user, res, function() {
                         res.writeHead(200, {'Content-Type': 'application/json'});
                         res.end('{"status": 1, "log": "保存成功"}');
@@ -296,8 +298,9 @@ function show(res) {
     serverStaticFile(res, '/img/test.png', 'text/html', 200);
 }
 
-function getBlogs(res, req) {
-    var dataObj = querystring.parse(url.parse(req.url.query));
+function getBlogsSummary(res, req) {
+    var dataObj = querystring.parse(url.parse(req.url).query);
+    console.log(dataObj);
     var data = {
         author: dataObj.author,
         page: dataObj.page
@@ -307,12 +310,15 @@ function getBlogs(res, req) {
         res.end('{"status": 0, "log": "参数有误"}');
         return;
     }
-    mongo.getBlogs(res, data, {
+    mongo.getBlogsSummary(res, data, {
         success: function(data) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(data);
         },
-        error: function() {}
+        error: function() {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end('{"status": 0, "log": "稍后再试"}');
+        }
     })
 }
 
@@ -334,4 +340,4 @@ exports.login = login;
 exports.getJs = getJs;
 exports.checkLogin = checkLogin;
 exports.publish = publish;
-exports.getBlogs = getBlogs;
+exports.getBlogsSummary = getBlogsSummary;

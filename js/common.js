@@ -10,8 +10,13 @@ var cookie = {
         document.cookie = str;
     },
     getCookie: function(key) {
-        reg=new RegExp("(^| )"+key+"=([^;]*)(;|$)");
-        return document.cookie.match(reg)[2];
+        var reg = new RegExp("(^| )"+key+"=([^;]*)(;|$)");
+        var name = document.cookie.match(reg);
+        if(name != null) {
+            return name[2];
+        } else {
+            return false;
+        }
     },
     removeCookie: function(key) {
         cookie.setCookie(key,cookie.getCookie(),-1);
@@ -21,10 +26,21 @@ var cookie = {
 var xhr = {
     formatParam: function (data){
         var arr = [];
+        var str = '';
         for(var name in data){
-            arr.push(encodeURIComponent(name) + "=" + encodeURIComponent(data[name]));
+            if(data[name] instanceof Array && data[name].constructor == Array) {
+                for(var i = 0; i < data[name].length; i++) {
+                    str += '&' + name + '=' + encodeURIComponent(data[name][i]);
+                }
+            } else {
+                arr.push(encodeURIComponent(name) + "=" + encodeURIComponent(data[name]));
+            }
         }
-        return arr.join('&');
+        if(arr.length) {
+            return arr.join('&') + str;
+        } else {
+            return str.substring(1);
+        }
     },
     ajax: function(option) {
         var x = new XMLHttpRequest();
@@ -34,24 +50,25 @@ var xhr = {
             } else {
                 x.open('get', option.url, true);
             }
+            x.send();
         } else if(option.type.toLowerCase() == 'post') {
             x.open('post', option.url, true);
             xhr.setHeader(x, {"Content-Type": "application/x-www-form-urlencoded"});
             xhr.setHeader(x, option.header);
             x.send(xhr.formatParam(option.data));
-            x.onreadystatechange = function () {
-                if(x.readyState == 4) {
-                    if(x.status == 200) {
-                        var res;
-                        if(option.dataType && option.dataType.toLowerCase() == 'json') {
-                            res = JSON.parse(x.response);
-                        }
-                        option.success && option.success(x.response);
-                    } else {
-                        option.error && option.error(x);
+        }
+        x.onreadystatechange = function () {
+            if(x.readyState == 4) {
+                if(x.status == 200) {
+                    var res;
+                    if(option.dataType && option.dataType.toLowerCase() == 'json') {
+                        res = JSON.parse(x.response);
                     }
-                    option.complete && option.complete(x)
+                    option.success && option.success(x.response);
+                } else {
+                    option.error && option.error(x);
                 }
+                option.complete && option.complete(x)
             }
         }
     },
@@ -61,5 +78,18 @@ var xhr = {
                 x.setRequestHeader(name,obj[name]);
             }
         }
+    }
+};
+
+var time = {
+    toYHM: function(tt) {
+        var date = new Date();
+        date.setTime(tt);
+        var d = date.getFullYear() + "-" + time.numFormat(date.getMonth() + 1) + "-" + time.numFormat(date.getDate());
+        var t = time.numFormat(date.getHours()) + ":" + time.numFormat(date.getMinutes());
+        return ({ date: d, time: t, full: d + " " + t });
+    },
+    numFormat: function(num) {
+        return (Math.abs(num) < 10) ? "0" + parseInt(num) : num;
     }
 };
