@@ -4,6 +4,7 @@
 
 var querystring = require('querystring');
 var url = require('url');
+var ObjectID = require('mongodb').ObjectID;
 var mongo = require('./mongo');
 var md5 = require('./md5');
 var fs = require('fs');
@@ -300,17 +301,36 @@ function show(res) {
 
 function getBlogsSummary(res, req) {
     var dataObj = querystring.parse(url.parse(req.url).query);
+    if(dataObj && (dataObj.author == null || dataObj.page == null)) {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end('{"status": 0, "log": "参数有误"}');
+        return;
+    }
     console.log(dataObj);
     var data = {
         author: dataObj.author,
         page: dataObj.page
     };
-    if(data.author == null || data.page == null) {
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end('{"status": 0, "log": "参数有误"}');
-        return;
-    }
     mongo.getBlogsSummary(res, data, {
+        success: function(data) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(data);
+        },
+        error: function() {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end('{"status": 0, "log": "稍后再试"}');
+        }
+    })
+}
+
+function getBlogDetail(res, req) {
+    var dataObj = querystring.parse(url.parse(req.url).query);
+    console.log('dataObj.pid: ' + dataObj.pid);
+    var data = {
+        '_id': ObjectID(dataObj.pid)
+    };
+    console.log('data: ' + data['_id']);
+    mongo.getBlogDetail(res, data, {
         success: function(data) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(data);
@@ -341,3 +361,4 @@ exports.getJs = getJs;
 exports.checkLogin = checkLogin;
 exports.publish = publish;
 exports.getBlogsSummary = getBlogsSummary;
+exports.getBlogDetail = getBlogDetail;

@@ -60,11 +60,11 @@ var xhr = {
         x.onreadystatechange = function () {
             if(x.readyState == 4) {
                 if(x.status == 200) {
-                    var res;
+                    var res = x.response;
                     if(option.dataType && option.dataType.toLowerCase() == 'json') {
                         res = JSON.parse(x.response);
                     }
-                    option.success && option.success(x.response);
+                    option.success && option.success(res);
                 } else {
                     option.error && option.error(x);
                 }
@@ -82,7 +82,7 @@ var xhr = {
 };
 
 var time = {
-    toYHM: function(tt) {
+    toTime: function(tt) {
         var date = new Date();
         date.setTime(tt);
         var d = date.getFullYear() + "-" + time.numFormat(date.getMonth() + 1) + "-" + time.numFormat(date.getDate());
@@ -93,3 +93,14 @@ var time = {
         return (Math.abs(num) < 10) ? "0" + parseInt(num) : num;
     }
 };
+
+var king = {
+    queryString: function(name) {
+        var reg = new RegExp("(^|&)"+name+"=([^&]*(&|$))");
+        var r = window.location.search.substr(1).match(reg);
+        if(r!=null) {
+            return decodeURI(r[2]);
+        }
+        return null;
+    }
+}

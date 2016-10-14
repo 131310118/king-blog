@@ -60,18 +60,33 @@ function publishBlog(data, user, res, callback) {
         journal: true,
         fsync: false
     };
-    myDB.collection(user + 'Blog', function(err, collection) {
+    myDB.collection('blogs', function(err, collection) {
         collection.insert(data, options, function(err, results) {
             callback();
             console.log(results);
         })
     });
 }
+function getBlogDetail(res, data, callback) {
+    myDB.collection('blogs', function(err, collection) {
+        collection.findOne(data, function(err, item) {
+            console.log('blogdetail: ' + item);
+            var jsonArray = {
+                '_id': item['_id'],
+                'author': item.author,
+                'publish_time': item['publish_time'],
+                'content': item.content,
+                'title': item.title
+            };
+            callback.success(JSON.stringify(jsonArray));
+        })
+    });
+}
 function getBlogsSummary(res, data, callback) {
     var totalPage = 0;
     var limit = 10;
-    myDB.collection(data.author + 'Blog', function(err, collection) {
-        collection.find({}, function(err, items) {
+    myDB.collection('blogs', function(err, collection) {
+        collection.find({'author': data.author}, function(err, items) {
             items.count(true, function(err, total) {
                 totalPage = Math.floor(total / limit);
                 if(total % limit != 0) {
@@ -171,3 +186,4 @@ exports.publishBlog = publishBlog;
 exports.getSalt = getSalt;
 exports.getPassword = getPassword;
 exports.getBlogsSummary = getBlogsSummary;
+exports.getBlogDetail = getBlogDetail;

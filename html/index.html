@@ -16,7 +16,7 @@
             outline: 0;
         }
         .article {
-            margin: 50px 0;
+            padding: 50px 0;
         }
         .article-meta:before,
         .article-meta:after {
@@ -70,6 +70,10 @@
             color: #555;
             padding: 0 20px;
         }
+        .article-entry p {
+            margin:5px;
+            font-size:14px;
+        }
         .article-entry:before,
         .article-entry:after {
             content: "";
@@ -77,6 +81,43 @@
         }
         .article-entry:after {
             clear: both;
+        }
+        .article-imgs {
+            height: 200px;
+        }
+        .artical-img {
+            height:300px;
+            position: relative;
+        }
+        .artical-img img{
+            max-width: 100%;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            box-sizing: border-box;
+        }
+        .article-block {
+            position: relative;
+            display: inline-block;
+            width: 33.3333%;
+            float:left;
+            height:100%;
+        }
+        .article-block img{
+            max-width: 100%;
+            position: absolute;
+            max-height: 100%;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            box-sizing: border-box;
+            padding-right: 10px;
+        }
+        .article-block:last-child img {
+            padding-right: 0;
         }
         .article-more-link a {
             display: inline-block;
@@ -126,29 +167,6 @@
 <!--header--><!--headerend-->
 <div class="content">
     <div class="container" id="articals">
-        <article class="article">
-            <div class="article-meta">
-                <a href="" class="article-date">
-                    <time>2016-09-29</time>
-                </a>
-            </div>
-            <div class="article-inner">
-                <header class="article-header">
-                    <h1>
-                        <a class="article-title" href="">Flink如何用窗格来优化窗口</a>
-                    </h1>
-                </header>
-                <div class="article-entry">
-                    <p>对于处理时间类型的窗口（包含了翻滚窗口和滑动窗口），Flink会使用称之为”pane”的技术来优化这类时间窗口的计算。</p>
-                    <p class="article-more-link">
-                        <a href="">Read More</a>
-                    </p>
-                </div>
-                <footer class="article-footer">
-                    <span class="author"><i class="fa author-icon"></i> 123</span>
-                </footer>
-            </div>
-        </article>
     </div>
 </div>
 </body>
@@ -168,30 +186,47 @@
             var articals = document.getElementById('articals');
             var str = '';
             for(var item in data.data) {
+                var href =  "/detail.html?pid=" + data.data[item]["_id"];
                 str += '<article class="article">\
                         <div class="article-meta">\
-                        <a href="" class="article-date">\
-                        <time>2016-09-29</time>\
+                        <a href="' + href + '" class="article-date">\
+                        <time>' + time.toTime(data.data[item].publish_time).full + '</time>\
                         </a>\
                         </div>\
                         <div class="article-inner">\
                         <header class="article-header">\
                         <h1>\
-                        <a class="article-title" href="">Flink如何用窗格来优化窗口</a>\
+                        <a class="article-title" href="' + href + '">' + data.data[item].title + '</a>\
                         </h1>\
                         </header>\
-                        <div class="article-entry">\
-                        <p>对于处理时间类型的窗口（包含了翻滚窗口和滑动窗口），Flink会使用称之为”pane”的技术来优化这类时间窗口的计算。</p>\
+                        <div class="article-entry">';
+                if(data.data[item].imgs) {
+                    if(data.data[item].imgs.length > 1) {
+                        str += '<div class="article-imgs">';
+                        for(var i = 0; i < data.data[item].imgs.length && i < 3; i++) {
+                            str += '<a class="article-block" href="' + href + '">\
+                                    <img alt="' + data.data[item].title + '" src="' + data.data[item].imgs[i] + '">\
+                                </a>';
+                        }
+                        str += '</div>';
+                    } else {
+                        str += '<a class="artical-img" href="' + href + '">\
+                                <img alt="' + data.data[item].title + '" src="' + data.data[item].imgs[0] + '">\
+                                </a>';
+                    }
+                }
+                str += decodeURIComponent(data.data[item].summary) + '\
                 <p class="article-more-link">\
-                    <a href="">Read More</a>\
+                    <a href="' + href + '">Read More</a>\
                     </p>\
                     </div>\
                     <footer class="article-footer">\
-                    <span class="author"><i></i>123</span>\
+                    <span class="author"><i class="fa author-icon"></i> ' + data.data[item].author + '</span>\
                     </footer>\
                     </div>\
                     </article>'
             }
+            articals.innerHTML = str;
         },
         error: function() {
             console.log(0);

@@ -53,9 +53,8 @@
                 password: MD5(encodeURIComponent(password))
             },
             success: function(data) {
-                var res = JSON.parse(data);
-                if(res && res.token) {
-                    cookie.setCookie('auth', res.token);
+                if(data && data.token) {
+                    cookie.setCookie('auth', data.token);
                     xhr.ajax({
                         url: '/checkLogin',
                         type: 'post',
