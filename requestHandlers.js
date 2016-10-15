@@ -342,6 +342,10 @@ function getBlogDetail(res, req) {
     })
 }
 
+function createClassify(res, req) {
+
+}
+
 exports.start = start;
 exports.upload = upload;
 exports.show = show;
@@ -362,3 +366,4 @@ exports.checkLogin = checkLogin;
 exports.publish = publish;
 exports.getBlogsSummary = getBlogsSummary;
 exports.getBlogDetail = getBlogDetail;
+exports.createClassify = createClassify;

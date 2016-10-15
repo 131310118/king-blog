@@ -161,11 +161,14 @@
 <script type="text/javascript" src="/editor.js"></script>
 <script type="text/javascript" src="/common.js"></script>
 <script type="text/javascript">
-    //分类
     var drop = document.getElementsByClassName('drop-box')[0];
     var classify = document.getElementById('classify');
     var classifyControl = document.getElementById('classifyControl');
+    var save = document.getElementsByClassName('save')[0];
+    var author = cookie.getCookie('auth');
+    //分类
     classifyControl.onclick = function() {
+        classifyWin.show();
     };
     document.getElementsByClassName('drop-list')[0].onclick = function() {
         if(drop.style.display != 'block') {
@@ -180,9 +183,7 @@
         classify.innerText = e.target.innerHTML;
     });
     //保存
-    var save = document.getElementsByClassName('save')[0];
     save.onclick = function() {
-        var author = cookie.getCookie('auth');
         if(!author) {
             return;
         }
@@ -194,12 +195,6 @@
         for(var i = 0; i < 3 && i < images.length; i++) {
             imgs[i] = images[i].getAttribute('src');
         }
-       /* imgs = imgs.join('","');
-        imgs = '["' + imgs + '"]';*/
-        //imgs = JSON.stringify(imgs);
-       /* for(var i=0;i<imgs.length;i++){
-            data["imgs[]"]=imgs[i]
-        }*/
         console.log(submitCon.innerHTML);
         xhr.ajax({
             type: 'post',
@@ -252,6 +247,222 @@
             }
             node = node.nextSibling;
         }
+    }
+
+    //弹出框
+    var classifyWin = win.baseWin({// 创建分类
+        title: "分类管理",
+        content: createclassifyWin(),
+        footer: popLinkFooter({
+            confirm: '确定',
+            callback: {
+                confirm: function () {
+                    classifyWin.hide();
+                }
+            }
+        })
+    });
+    function popLinkFooter(option) {// 重写弹出框footer部分
+        var footer = document.createDocumentFragment();
+        if (option.confirm) {
+            var confirm = footer.appendChild(king.tag("button", {
+                className: "btn btn-primary",
+                innerHTML: option.confirm
+            }));
+            confirm.onclick = function () {
+                if (option.callback.confirm() !== false) {
+                    classifyWin.hide();
+                }
+
+            };
+        }
+        if (option.cancel) {
+            var cancel = footer.appendChild($.tag("button", {
+                className: "btn btn-default",
+                innerHTML: option.cancel
+            }));
+            cancel.onclick = function () {
+                if (option.callback.cancel() !== false) {
+                    classifyWin.hide();
+                }
+            };
+        }
+        return footer;
+    }
+    function createclassifyWin()  {// 创建分类弹出框
+        var group = king.tag('div', 'pop-group');
+        group.append('div', 'form-group');
+        var category = group.append('div', {
+            id: 'category',
+            className: 'category'
+        });
+        category.input = category.append('input', {
+            type: 'text',
+            placeholder: '最多可输入14个中文字符',
+            name: 'input',
+            className: 'input-control col-sm-5',
+            id: 'input',
+            maxLength: '14'
+        });
+        var btn = category.append('div', 'col-sm-2').append('span', {
+            className: 'btn btn-default',
+            innerHTML: '创建分类'
+        });
+        // 创建分类
+        btn.onclick = function (e) {
+            event.preventDefault();
+            var val = category.input.value.trim();
+            if (val == '') {
+                category.input.select();
+                return false;
+            }
+            if(!/^[\u4e00-\u9fa5A-Za-z0-9]{1,14}$/gi.test(category.input.value)){
+                tips.show({text: '请用中文、英文或数字'});
+                category.input.select();
+                return false;
+            }
+
+            xhr.ajax({
+                url: '/createClassify',
+                type: 'POST',
+                data: {name: val},
+                header: {
+                    Auth: author
+                },
+                success: function (data) {
+                    // 弹出框添加分类
+                    createclassifyWinItem(data.id, category.input.value);
+
+                    category.input.value = '';
+                },
+                error: function (xhr) {
+                    tips.show({text: xhr.responseJSON.err_msg});
+                }
+            });
+        };
+
+        category.append('span', {
+            className: 'col-sm-5',
+            innerHTML: '请用中文、英文或数字。'
+        });
+
+        var categoryList = group.append('div', 'categoryList');
+        categoryList.append('ul', {
+            id: 'categoryList',
+            className: 'clearfix'
+        });
+        // 分页样式
+        /*categoryList.append('div', 'mgr_page').append('ul', {
+         id: 'categoryPager',
+         className: 'cl'
+         });*/
+
+        return group;
+    }
+    function createclassifyWinItem(id, name, editable) {// 弹出框添加分类
+        if(id == '000000000000000000000000') return false;
+        var li = king.tag('li');
+        li.tit = li.append('span', {
+            className: 'htit',
+            id: id,
+            title: name,
+            innerHTML: name
+        });
+        li.tit.setAttribute('contenteditable', 'false');
+        li.tit.onblur = function () {
+            if(this.innerHTML.trim().length > 14){
+                tips.show({text: '最多可输入14个中文字符'});
+                this.focus();
+                return false;
+            }
+            if(!/^[\u4e00-\u9fa5A-Za-z0-9]{1,14}$/gi.test(this.innerHTML)){
+                tips.show({text: '请用中文、英文或数字'});
+                this.focus();
+                return false;
+            }
+
+            // 修改分类名称
+            if (this.bool) {
+                this.bool = false;
+                return false
+            }
+           /* xhr.ajax({
+                url: '/i/hack/blogCatalog/' + this.id + '/edit',
+                type: 'PATCH',
+                data: {name: this.innerHTML},
+                success: function (data) {
+
+                },
+                error: function (xhr) {
+                    tips.show({text: xhr.responseJSON.err_msg});
+                },
+                complete: function (xhr) {
+                    closeEdit();
+                }
+            });*/
+        };
+        li.tit.onkeyup = function (e) {// 设置ESC按钮
+            if (e.keyCode == 27){
+                var categoryList = document.getElementsByClassName('categoryList')[0];
+                this.innerHTML = categoryList.replace;
+                categoryList.replace = '';
+
+                closeEdit(categoryList);
+
+                this.bool = true;
+                this.blur();
+            }
+        };
+
+        var control = li.append('span', 'control');
+        if(editable != 0) {
+            var edit = control.append('a', {
+                className: 'edit',
+                href: 'javascript: void(0);',
+                innerHTML: '[编辑]'
+            });
+            // 编辑分类
+            $(edit).click(function (e) {
+                $.breakEvent(e);
+                this.parentNode.parentNode.tit.setAttribute('contenteditable', 'true');
+                this.parentNode.parentNode.tit.focus();
+                this.parentNode.parentNode.className = 'on';
+                categoryList.className += ' active';
+
+                // 初始值
+                categoryList.replace = this.parentNode.parentNode.tit.innerHTML;
+                // 全选不行？？？
+            });
+        }
+        var del = control.append('a', {
+            className: 'del',
+            href: 'javascript: void(0);',
+            innerHTML: '[删除]'
+        });
+        // 删除分类
+        $(del).click(function (e) {
+            categoryList.deleteNode = this.parentNode.parentNode;
+            $.ajax({
+                url: '/i/hack/blogCatalog/' + this.parentNode.parentNode.tit.id + '/del',
+                type: 'DELETE',
+                success: function (data) {
+                    categoryList.removeChild(categoryList.deleteNode);
+                    tips.show({text: data.msg});
+                },
+                error: function (xhr) {
+                    tips.show({text: xhr.responseJSON.err_msg});
+                },
+                complete: function (xhr) {
+                    categoryList.deleteNode = null;
+                }
+            });
+
+        });
+        categoryList.appendChild(li);
+    }
+    function closeEdit(categoryList) {// 取消分类修改　||　完成分类修改
+        categoryList.className = 'clearfix';
+        $('.on', categoryList).removeAttr('class');
     }
 </script>
 </html>

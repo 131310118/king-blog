@@ -86,7 +86,27 @@ function getBlogsSummary(res, data, callback) {
     var totalPage = 0;
     var limit = 10;
     myDB.collection('blogs', function(err, collection) {
-        collection.find({'author': data.author}, function(err, items) {
+        collection.count({}, function(err, count) {
+            totalPage = Math.floor(count / limit);
+            if(count % limit != 0) {
+                totalPage++;
+            }
+            var currentPage = data.page > totalPage?totalPage:data.page;
+            console.log('totalPage: ' + totalPage + '\nlimit: ' + limit + '\ncurrentPage: ' + currentPage + '\nskip: ' + Math.floor(currentPage - 1) * limit);
+            collection.find({}, {"title": 1, "summary": 1, "imgs": 1, "publish_time": 1, "author": 1})
+                .limit(limit)
+                .skip(Math.floor(currentPage - 1) * limit)
+                .toArray(function(err, results) {
+                    console.log('result: ' + results);
+                    var jsonArray = {
+                        totalPage: totalPage,
+                        limit: limit,
+                        data: results
+                    };
+                    callback.success(JSON.stringify(jsonArray));
+                });
+        });
+        /*collection.find({'author': data.author}, function(err, items) {
             items.count(true, function(err, total) {
                 totalPage = Math.floor(total / limit);
                 if(total % limit != 0) {
@@ -107,73 +127,7 @@ function getBlogsSummary(res, data, callback) {
                         callback.success(JSON.stringify(jsonArray));
                     });
             });
-            /*total = items.length;
-            totalPage = Math.floor(total / limit);
-            if(total % limit != 0) {
-                totalPage++;
-            }
-            var currentPage = data.page > totalPage?totalPage:data.page;
-            console.log('totalPage: ' + totalPage + '\nlimit: ' + limit + '\ncurrentPage: ' + currentPage + '\nskip: ' + Math.floor(currentPage - 1) * limit);
-            collection.find({}, {"title": 1, "summary": 1, "imgs": 1, "publish_time": 1, "author": 1})
-                .limit(limit)
-                .skip(Math.floor(currentPage - 1) * limit)
-                .toArray(function(err, results) {
-                    console.log('result: ' + results);
-                    var jsonArray = {
-                        totalPage: totalPage,
-                        limit: limit,
-                        data: results
-                    };
-                    callback.success(JSON.stringify(jsonArray));
-                });*/
-        });
-      /*  collection.count(function(err, count) {
-            total = count;
-        });
-        console.log("count: " + count);
-        totalPage = Math.floor(total / limit);
-        if(total % limit != 0) {
-            totalPage++;
-        }*/
-        /*var currentPage = data.page > totalPage?totalPage:data.page;
-        console.log('totalPage: ' + totalPage + '\nlimit: ' + limit + '\ncurrentPage: ' + currentPage + '\nskip: ' + Math.floor(currentPage - 1) * limit);
-        collection.find(/!*{}, {"title": 1, "summary": 1, "imgs": 1, "publish_time": 1, "author": 1}*!/)
-            .limit(limit)
-            .skip(Math.floor(currentPage - 1) * limit)
-            .toArray(function(err, results) {
-                console.log('result: ' + results);
-                var jsonArray = {
-                    totalPage: totalPage,
-                    limit: limit,
-                    data: results
-                };
-                callback.success(JSON.stringify(jsonArray));
-            });*/
-     /*   collection.find().exec(function(err, items) {
-            var currentPage = data.page;
-            if(err) {
-                callback.error();
-            } else {
-                var totalPage = Math.floor(count / limit);
-                if(items.length % limit != 0) {
-                    totalPage++;
-                }
-                if(data.page > totalPage) {
-                    currentPage = totalPage;
-                }
-                var query = collection.find({}, {"title": 1, "summary": 1, "imgs": 1, "publish_time": 1, "author": 1});
-                query.skip((currentPage - 1) * limit);
-                query.limit(limit);
-                query.exec(function(err, result) {
-                    var jsonArray = {
-                        totalCount: items.length,
-                        limit: limit,
-                        data: result
-                    };
-                    callback.success(jsonArray);
-                })
-            }
-        })*/
+        });*/
     })
 }
 function closeDB(collection) {
