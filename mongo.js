@@ -106,28 +106,44 @@ function getBlogsSummary(res, data, callback) {
                     callback.success(JSON.stringify(jsonArray));
                 });
         });
-        /*collection.find({'author': data.author}, function(err, items) {
-            items.count(true, function(err, total) {
-                totalPage = Math.floor(total / limit);
-                if(total % limit != 0) {
-                    totalPage++;
-                }
-                var currentPage = data.page > totalPage?totalPage:data.page;
-                console.log('totalPage: ' + totalPage + '\nlimit: ' + limit + '\ncurrentPage: ' + currentPage + '\nskip: ' + Math.floor(currentPage - 1) * limit);
-                collection.find({}, {"title": 1, "summary": 1, "imgs": 1, "publish_time": 1, "author": 1})
-                    .limit(limit)
-                    .skip(Math.floor(currentPage - 1) * limit)
-                    .toArray(function(err, results) {
-                        console.log('result: ' + results);
-                        var jsonArray = {
-                            totalPage: totalPage,
-                            limit: limit,
-                            data: results
-                        };
-                        callback.success(JSON.stringify(jsonArray));
-                    });
-            });
-        });*/
+    })
+}
+function createClassify(res, data, callback) {
+    myDB.collection('users', function(err, collection) {
+        collection.updateOne({username:data.username}, {$addToSet:{tags:data.tagName}}, {upsert:true}, function(err, r) {
+            console.log('tags ' + r);
+            if(err) {
+                callback.error();
+                return;
+            }
+            if(r.result.n == 1) {
+                callback.success();
+            } else {
+                callback.error()
+            }
+        })
+    })
+}
+function getClassify(res, data, callback) {
+    myDB.collection('users', function(err, collection) {
+        collection.findOne({username: data.username}, {fields: {tags: 1, _id: 0}}, function(err, r) {
+            if(!r) {
+                callback.success(JSON.stringify({tags: []}));
+                return;
+            }
+            console.log('findTags ' + r.tags);
+            if(err) {
+                callback.error();
+                return;
+            }
+            var arrTags = r.tags.toString().split(',');
+            callback.success(JSON.stringify({tags: arrTags}));
+            /*if(r.result.ok == 1) {
+                callback.success(r);
+            } else {
+                callback.error()
+            }*/
+        })
     })
 }
 function closeDB(collection) {
@@ -141,3 +157,5 @@ exports.getSalt = getSalt;
 exports.getPassword = getPassword;
 exports.getBlogsSummary = getBlogsSummary;
 exports.getBlogDetail = getBlogDetail;
+exports.createClassify = createClassify;
+exports.getClassify = getClassify;

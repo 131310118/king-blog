@@ -28,6 +28,7 @@ handle['/publish'] = requestHandlers.publish;
 handle['/blogs'] = requestHandlers.getBlogsSummary;
 handle['/getBlogDetail'] = requestHandlers.getBlogDetail;
 handle['/createClassify'] = requestHandlers.createClassify;
+handle['/getClassify'] = requestHandlers.getClassify;
 
 function route(pathname, res, req){
     console.log('About to route a request for ' + pathname);

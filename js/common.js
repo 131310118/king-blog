@@ -50,6 +50,7 @@ var xhr = {
             } else {
                 x.open('get', option.url, true);
             }
+            xhr.setHeader(x, option.header);
             x.send();
         } else if(option.type.toLowerCase() == 'post') {
             x.open('post', option.url, true);

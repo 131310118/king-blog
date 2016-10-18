@@ -122,8 +122,7 @@ function upload(res, req) {
                 break;
         }*/
         fs.renameSync(files.file.path, '/root/myblog/img/' + name/* + extName*/);
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end('{"url": "' + name + '"}');
+        writeEnd(res, '{"url": "' + name + '"}', 200);
     })
 }
 
@@ -140,20 +139,22 @@ function publish(res, req) {
                     console.log(alldata);
                     var dataString = alldata.toString();
                     var dataObj = querystring.parse(dataString);
-                    if(dataObj.title
-                        && dataObj.title.length
-                        && dataObj.content
-                        && dataObj.content.length
-                        && (dataObj["imgs[]"].length
-                        || (dataObj.summary && dataObj.summary.length))
+                    if(!dataObj) {
+                        writeEnd(res, '{"status": 0, "log": "参数有误"}', 200);
+                        return;
+                    }
+                    var title = dataObj.title;
+                    var content = dataObj.content;
+                    var imgs = dataObj["imgs[]"];
+                    var summary = dataObj.summary;
+                    var classify = dataObj.classify;
+                    if(title == null
+                        || content == null
+                        || classify == null
+                        || (!imgs.length
+                        && (summary == null))
                     ) {
-                        var title = dataObj.title;
-                        var content = dataObj.content;
-                        var imgs = dataObj["imgs[]"];
-                        var summary = dataObj.summary
-                    } else {
-                        res.writeHead(200, {'Content-Type': 'application/json'});
-                        res.end('{"status": 0, "log": "参数有误"}');
+                        writeEnd(res, '{"status": 0, "log": "参数有误"}', 200);
                         return;
                     }
                     mongo.publishBlog({
@@ -161,16 +162,15 @@ function publish(res, req) {
                         content: content,
                         imgs: imgs,
                         summary: summary,
+                        classify: classify,
                         publish_time: new Date()*1,
                         author: user
                     }, user, res, function() {
-                        res.writeHead(200, {'Content-Type': 'application/json'});
-                        res.end('{"status": 1, "log": "保存成功"}');
+                        writeEnd(res, '{"status": 1, "log": "保存成功"}', 200);
                     });
                 },
                 error: function() {
-                    res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.end('{"status": 0, "log": "没有权限"}');
+                    writeEnd(res, '{"status": 0, "log": "没有权限"}', 200);
                 }
             });
         })
@@ -189,8 +189,7 @@ function registed(res, req, pathname) {
             var dataString = alldata.toString();
             var dataObj = querystring.parse(dataString);
             if(!(dataObj.username&&dataObj.password)){
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end('{"status": 0, "log": "参数有误"}');
+                writeEnd(res, '{"status": 0, "log": "参数有误"}', 200);
                 return;
             }
             var salt = {
@@ -207,8 +206,7 @@ function registed(res, req, pathname) {
             console.log(data);
             console.log(salt);
             mongo.addUser(data, salt, res, function() {
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end('{"status": 1, "log": "注册成功"}');
+                writeEnd(res, '{"status": 1, "log": "注册成功"}', 200);
             });
         })
     }
@@ -226,8 +224,7 @@ function login(res, req) {
             var dataString = alldata.toString();
             var dataObj = querystring.parse(dataString);
             if(!(dataObj.username&&dataObj.password)){
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end('{"status": 0, "log": "参数有误"}');
+                writeEnd(res, '{"status": 0, "log": "参数有误"}', 200);
                 return;
             }
             mongo.getSalt(dataObj.username, function(salt){
@@ -235,12 +232,10 @@ function login(res, req) {
                     if(md5.md5(salt+dataObj.password)==password){
                         var token = jwt.sign({username: dataObj.username, iat: Math.floor(Date.now()/1000) + 30}, 'womenzuiqiang');
                         console.log(token);
-                        res.writeHead(200, {'Content-Type': 'application/json'});
-                        res.end('{"token": "' + token + '"}');
+                        writeEnd(res, '{"token": "' + token + '"}', 200);
                     } else {
                         console.log(md5.md5(salt+dataObj.password)+':'+password);
-                        res.writeHead(200, {'Content-Type': 'application/json'});
-                        res.end('{"status": 0, "log": "登陆失败"}');
+                        writeEnd(res, '{"status": 0, "log": "登陆失败"}', 200);
                     }
                 })
             });
@@ -256,54 +251,39 @@ function checkLogin(res, req) {
         });
 
         req.on('end', function() {
-           /* console.log(alldata);
-            var dataString = alldata.toString();
-            var dataObj = querystring.parse(dataString);
-            if(!(dataObj.username&&dataObj.password)){
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end('{"status": 0, "log": "参数有误"}');
-                return;
-            }*/
             check(req, {
                 callback: function() {
-                    res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.end('{"status": 1, "log": "验证成功"}');
+                    writeEnd(res, '{"status": 1, "log": "验证成功"}', 200);
                 },
                 error: function() {
-                    res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.end('{"status": 0, "log": "验证失败"}');
+                    writeEnd(res, '{"status": 0, "log": "验证失败"}', 200);
                 }
             });
-            /*jwt.verify(req.headers.auth, 'womenzuiqiang', function(err, decode) {
-                if(decode.username == '123') {
-                    res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.end('{"status": 1, "log": "验证成功"}');
-                }
-            })*/
         })
     }
 }
 
 function check(req, option) {
     jwt.verify(req.headers.auth, 'womenzuiqiang', function(err, decode) {
-        if(decode.username && decode.username == '123') {
-            option.callback(decode.username);
+        console.log('nsername: ' + decode);
+        if(decode && decode.username == '123') {
+            if(option && option.callback) {
+                option.callback(decode.username);
+            }
+            return decode.username
         } else {
-            option.error();
+            if(option && option.error) {
+                option.error();
+            }
+            return false;
         }
     })
-}
-
-function show(res) {
-    console.log('Request handle "show" was called.');
-    serverStaticFile(res, '/img/test.png', 'text/html', 200);
 }
 
 function getBlogsSummary(res, req) {
     var dataObj = querystring.parse(url.parse(req.url).query);
     if(dataObj && (dataObj.author == null || dataObj.page == null)) {
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end('{"status": 0, "log": "参数有误"}');
+        writeEnd(res, '{"status": 0, "log": "参数有误"}', 200);
         return;
     }
     console.log(dataObj);
@@ -313,12 +293,10 @@ function getBlogsSummary(res, req) {
     };
     mongo.getBlogsSummary(res, data, {
         success: function(data) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(data);
+            writeEnd(res, data, 200);
         },
         error: function() {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end('{"status": 0, "log": "稍后再试"}');
+            writeEnd(res, '{"status": 0, "log": "稍后再试"}', 200);
         }
     })
 }
@@ -326,29 +304,86 @@ function getBlogsSummary(res, req) {
 function getBlogDetail(res, req) {
     var dataObj = querystring.parse(url.parse(req.url).query);
     console.log('dataObj.pid: ' + dataObj.pid);
+    if(dataObj.pid == null) {
+        writeEnd(res, '{"status": 0, "log": "参数有误"}', 200);
+    }
     var data = {
         '_id': ObjectID(dataObj.pid)
     };
     console.log('data: ' + data['_id']);
     mongo.getBlogDetail(res, data, {
         success: function(data) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(data);
+            writeEnd(res, data, 200);
         },
         error: function() {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end('{"status": 0, "log": "稍后再试"}');
+            writeEnd(res, '{"status": 0, "log": "稍后再试"}', 200);
         }
     })
 }
 
 function createClassify(res, req) {
+    if(req.method.toLowerCase() === 'post') {
+        var alldata = '';
+        req.on('data', function(chunk) {
+            alldata += chunk;
+        });
 
+        req.on('end', function() {
+            var dataString = alldata.toString();
+            var dataObj = querystring.parse(dataString);
+            if(dataObj.name == null) {
+                writeEnd(res, '{"status": 0, "log": "参数有误"}', 200);
+            }
+            var data = {
+                tagName: dataObj.name
+            };
+            check(req, {
+                callback: function(auth) {
+                    data.username = auth;
+                    mongo.createClassify(res, data, {
+                        success: function() {
+                            writeEnd(res, '{"status": 1, "log": "创建成功"}', 200);
+                        },
+                        error: function() {
+                            writeEnd(res, '{"status": 0, "log": "创建失败"}', 200);
+                        }
+                    });
+                },
+                error: function() {
+                    writeEnd(res, '{"status": 0, "log": "没有权限"}', 200);
+                }
+            })
+        })
+    }
+}
+
+function getClassify(res, req) {
+    var data = {};
+    check(req, {
+        callback: function(auth) {
+            data.username = auth;
+            mongo.getClassify(res, data, {
+                success: function(data) {
+                    writeEnd(res, data, 200);
+                },
+                error: function() {
+                    writeEnd(res, '{"status": 0, "log": "获取失败"}', 200);
+                }
+            });
+        },
+        error: function() {
+            writeEnd(res, '{"status": 0, "log": "没有权限"}', 200);
+        }
+    })
+}
+
+function writeEnd(res, data, status) {
+    res.writeHead(status, {'Content-Type': 'application/json'});
+    res.end(data);
 }
 
 exports.start = start;
 exports.upload = upload;
-exports.show = show;
 exports.getIco = getIco;
 exports.getPng = getPng;
 /*exports.getGif = getGif;*/
@@ -367,3 +402,4 @@ exports.publish = publish;
 exports.getBlogsSummary = getBlogsSummary;
 exports.getBlogDetail = getBlogDetail;
 exports.createClassify = createClassify;
+exports.getClassify = getClassify;
