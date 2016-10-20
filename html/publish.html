@@ -188,7 +188,7 @@
     xhr.ajax({
         type: 'get',
         dataType: 'json',
-        url: '/getClassify',
+        url: '/api/getClassify',
         header: {
             Auth: author
         },
@@ -247,7 +247,7 @@
                 "summary": encodeURIComponent(submitCon.innerHTML.replace(/<img[^>]*>/g, '').substring(0, 300)),
                 "classify": classify.innerText
             },
-            url: '/publish',
+            url: '/api/publish',
             dataType: 'json',
             header: {
                 Auth: author
@@ -323,7 +323,7 @@
             }
 
             xhr.ajax({
-                url: '/createClassify',
+                url: '/api/createClassify',
                 type: 'POST',
                 data: {name: val},
                 header: {
@@ -354,7 +354,7 @@
         xhr.ajax({
             type: 'get',
             dataType: 'json',
-            url: '/getClassify',
+            url: '/api/getClassify',
             header: {
                 Auth: author
             },

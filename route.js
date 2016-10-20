@@ -34,9 +34,9 @@ function route(pathname, res, req){
     console.log('About to route a request for ' + pathname);
     var roat = pathname.match(/\.(\w+)$/);
     if(roat) {
-        var file = pathname.match(/\.(\w+)$/)[1]||pathname;
+        var file = roat[1]||pathname;
     } else {
-        file = pathname;
+        file = pathname.match(/\/([^/]*$)/)[1];
     }
     //var file = pathname.match(/\.(\w+)$/)[1]||pathname;
     if(file instanceof Array){

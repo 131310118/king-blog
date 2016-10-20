@@ -47,7 +47,7 @@
         var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
         xhr.ajax({
-            url: '/login',
+            url: '/api/login',
             type: 'post',
             dataType: 'json',
             data: {
@@ -58,7 +58,7 @@
                 if(data && data.token) {
                     cookie.setCookie('auth', data.token);
                     xhr.ajax({
-                        url: '/checkLogin',
+                        url: '/api/checkLogin',
                         type: 'post',
                         dataType: 'json',
                         header: {
