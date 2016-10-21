@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'FontAwesome';
-    src: url('/fontawesome-webfont.eot?v=4.6.3');
-    src: url('/fontawesome-webfont.eot?#iefix&v=4.6.3') format('embedded-opentype'), url('/fontawesome-webfont.woff2?v=4.6.3') format('woff2'), url('/fontawesome-webfont.woff?v=4.6.3') format('woff'), url('/fontawesome-webfont.ttf?v=4.6.3') format('truetype'), url('/fontawesome-webfont.svg?v=4.6.3#fontawesomeregular') format('svg');
+    src: url('/fonts/fontawesome-webfont.eot?v=4.6.3');
+    src: url('/fonts/fontawesome-webfont.eot?#iefix&v=4.6.3') format('embedded-opentype'), url('/fonts/fontawesome-webfont.woff2?v=4.6.3') format('woff2'), url('/fonts/fontawesome-webfont.woff?v=4.6.3') format('woff'), url('/fonts/fontawesome-webfont.ttf?v=4.6.3') format('truetype'), url('/fonts/fontawesome-webfont.svg?v=4.6.3#fontawesomeregular') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -203,7 +203,7 @@ input:focus {
     line-height: 30px;
 }
 .tipspop .popshow-tips span {
-    background: url('/ico_warn.png') no-repeat -50px -204px;
+    background: url('/img/ico_warn.png') no-repeat -50px -204px;
     padding: 5px 12px;
     position: relative;
     top: 3px;
@@ -436,15 +436,15 @@ input:focus {
 }
 .pop .pop-imgReplace .uploadTips-tips > i,
 .pop .pop-imgReplace .uploadTips-tips > span {
-    background: url("../img/ico_warn.png") rgba(0, 0, 0, 0) no-repeat scroll 0 -200px;
+    background: url("/img/ico_warn.png") rgba(0, 0, 0, 0) no-repeat scroll 0 -200px;
 }
 .pop .pop-imgReplace .uploadTips-warn > i,
 .pop .pop-imgReplace .uploadTips-warn > span {
-    background: url("../img/ico_warn.png") rgba(0, 0, 0, 0) no-repeat scroll 0 -50px;
+    background: url("/img/ico_warn.png") rgba(0, 0, 0, 0) no-repeat scroll 0 -50px;
 }
 .pop .pop-imgReplace .uploadTips-ok > i,
 .pop .pop-imgReplace .uploadTips-ok > span {
-    background: url("../img/ico_warn.png") rgba(0, 0, 0, 0) no-repeat scroll 0 0;
+    background: url("/img/ico_warn.png") rgba(0, 0, 0, 0) no-repeat scroll 0 0;
 }
 .pop .pop-imgReplace div[class*="uploadTips-"] {
     line-height: 18px;
@@ -1115,15 +1115,6 @@ input:focus {
     content: '';
     padding: 0 8px;
     margin-right: 5px;
-}
-.hack-pop .form-tips-success:before {
-    background: url("/ico_warn.png") no-repeat 0 0px;
-}
-.hack-pop .form-tips-info:before {
-    background: url("/ico_warn.png") no-repeat 0 -200px;
-}
-.hack-pop .form-tips-waring:before {
-    background: url("/ico_warn.png") no-repeat 0 -50px;
 }
 .hack-pop .pop-search {
     margin-top: -7px;

@@ -33,7 +33,7 @@
 }
 #kingEditor .kETool_bg {
   margin: 1px;
-  background-image: url('/icons.png');
+  background-image: url('/img/icons.png');
 }
 #kingEditor #kETool_i {
   background-position: -60px 0;
@@ -198,7 +198,7 @@
 	display: inline-block;
     height: 16px;
     width: 22px;
-    background: url('/icons-all.gif') 6px -205px;
+    background: url('/img/icons-all.gif') 6px -205px;
     content: '';
     position: absolute;
     left: 4px;

@@ -36,7 +36,12 @@ function route(pathname, res, req){
     if(roat) {
         var file = roat[1]||pathname;
     } else {
-        file = pathname.match(/\/([^/]*$)/)[1];
+        file = pathname.match(/\/api(\/[^/]*$)/);
+        if(file) {
+            file = file[1];
+        } else {
+            file = pathname;
+        }
     }
     //var file = pathname.match(/\.(\w+)$/)[1]||pathname;
     if(file instanceof Array){

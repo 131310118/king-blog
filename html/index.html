@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>king's blog</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="/common.css">
-    <link rel="stylesheet" href="/index.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/index.css">
     <style type="text/css">
         .blog input {
             width: 100%;
@@ -189,7 +189,7 @@
             var articals = document.getElementById('articals');
             var str = '';
             for(var item in data.data) {
-                var href =  "/detail.html?pid=" + data.data[item]["_id"];
+                var href =  "/html/detail.html?pid=" + data.data[item]["_id"];
                 str += '<article class="article">\
                         <div class="article-meta">\
                         <a href="' + href + '" class="article-date">\

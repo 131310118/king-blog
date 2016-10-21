@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>king's blog</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link type="text/css" rel="stylesheet" href="/common.css">
-    <link type="text/css" rel="stylesheet" href="/editor.css">
+    <link type="text/css" rel="stylesheet" href="/css/common.css">
+    <link type="text/css" rel="stylesheet" href="/css/editor.css">
     <style type="text/css">
         .content {
             background-color: #fff;
@@ -163,8 +163,8 @@
 </div>
 </body>
 <!--script-select_on--><!--script-select_onend-->
-<script type="text/javascript" src="/editor.js"></script>
-<script type="text/javascript" src="/common.js"></script>
+<script type="text/javascript" src="/js/editor.js"></script>
+<script type="text/javascript" src="/js/common.js"></script>
 <script type="text/javascript">
     var drop = document.getElementsByClassName('drop-box')[0];
     var classify = document.getElementById('classify');
@@ -185,7 +185,7 @@
     });
 
     //分类
-    xhr.ajax({
+   /* xhr.ajax({
         type: 'get',
         dataType: 'json',
         url: '/api/getClassify',
@@ -206,7 +206,7 @@
         },
         error: function() {
         }
-    });
+    });*/
     classifyControl.onclick = function() {
         classifyWin.show();
     };
@@ -365,6 +365,11 @@
                         categoryList.appendChild(king.tag('span', {
                             className: 'htit',
                             title: item,
+                            innerHTML: item
+                        }));
+                        tags.appendChild(king.tag('li', {
+                            title: item,
+                            value: item,
                             innerHTML: item
                         }));
                     })

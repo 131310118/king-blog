@@ -265,7 +265,7 @@ function checkLogin(res, req) {
 
 function check(req, option) {
     jwt.verify(req.headers.auth, 'womenzuiqiang', function(err, decode) {
-        console.log('nsername: ' + decode);
+        console.log('username: ' + decode);
         if(decode && decode.username == '123') {
             if(option && option.callback) {
                 option.callback(decode.username);

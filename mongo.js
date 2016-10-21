@@ -127,10 +127,14 @@ function createClassify(res, data, callback) {
 function getClassify(res, data, callback) {
     myDB.collection('users', function(err, collection) {
         collection.findOne({username: data.username}, {fields: {tags: 1, _id: 0}}, function(err, r) {
-            if(!r) {
+            if(!r.tags) {
                 callback.success(JSON.stringify({tags: []}));
                 return;
             }
+            /*console.log(!r);
+            for(var key in r) {
+                console.log('r.' + key + ': ' + r[key]);
+            }*/
             console.log('findTags ' + r.tags);
             if(err) {
                 callback.error();
