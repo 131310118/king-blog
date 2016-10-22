@@ -122,7 +122,7 @@ function upload(res, req) {
                 break;
         }*/
         fs.renameSync(files.file.path, '/root/myblog/img/' + name/* + extName*/);
-        writeEnd(res, '{"url": "' + name + '"}', 200);
+        writeEnd(res, '{"url": "/img/' + name + '"}', 200);
     })
 }
 

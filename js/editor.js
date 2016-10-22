@@ -927,7 +927,7 @@ kETool_img.addEventListener('change',function(){
     var form = new FormData();
     form.append("file", document.getElementById('kETool_img').files[0]);
     var xhr = new XMLHttpRequest();
-    xhr.open('post', '/upload', true);
+    xhr.open('post', '/api/upload', true);
     xhr.send(form);
     xhr.onreadystatechange = function () {
         if(xhr.readyState == 4) {
