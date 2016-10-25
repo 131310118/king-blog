@@ -44,7 +44,7 @@ function start(res, req, pathname) {
     console.log('Request handler "start" was called.');
 
     pathname = pathname == '/'?'/index.html':pathname;
-    serverStaticFile(res, '/html' + pathname, 'text/html', 200);
+    serverStaticFile(res, pathname, 'text/html', 200);
 }
 
 function getIco(res, req, pathname) {
@@ -56,7 +56,7 @@ function getIco(res, req, pathname) {
 function getPng(res, req, pathname, file) {
     console.log('Request handler "start" was called.');
 
-    serverStaticFile(res, '/img' + pathname, 'image/' + file, 200);
+    serverStaticFile(res, pathname, 'image/' + file, 200);
 }
 
 /*function getGif(res, req, pathname, file) {
@@ -66,35 +66,35 @@ function getPng(res, req, pathname, file) {
 }*/
 
 function getCss(res, req, pathname) {
-    serverStaticFile(res, '/css' + pathname, 'text/css', 200);
+    serverStaticFile(res, pathname, 'text/css', 200);
 }
 
 function getOtf(res, req, pathname) {
-    serverStaticFile(res, '/fonts' + pathname, 'application/font-otf', 200);
+    serverStaticFile(res, pathname, 'application/font-otf', 200);
 }
 
 function getEot(res, req, pathname) {
-    serverStaticFile(res, '/fonts' + pathname, 'application/font-eot', 200);
+    serverStaticFile(res, pathname, 'application/font-eot', 200);
 }
 
 function getSvg(res, req, pathname) {
-    serverStaticFile(res, '/fonts' + pathname, 'application/font-svg', 200);
+    serverStaticFile(res, pathname, 'application/font-svg', 200);
 }
 
 function getTtf(res, req, pathname) {
-    serverStaticFile(res, '/fonts' + pathname, 'application/font-ttf', 200);
+    serverStaticFile(res, pathname, 'application/font-ttf', 200);
 }
 
 function getWoff(res, req, pathname) {
-    serverStaticFile(res, '/fonts' + pathname, 'application/font-woff', 200);
+    serverStaticFile(res, pathname, 'application/font-woff', 200);
 }
 
 function getWoff2(res, req, pathname) {
-    serverStaticFile(res, '/fonts' + pathname, 'application/font-woff2', 200);
+    serverStaticFile(res,  pathname, 'application/font-woff2', 200);
 }
 
 function getJs(res, req, pathname) {
-    serverStaticFile(res, '/js' + pathname, 'text/javascript', 200);
+    serverStaticFile(res, pathname, 'text/javascript', 200);
 }
 
 function upload(res, req) {
