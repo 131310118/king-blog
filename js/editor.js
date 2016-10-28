@@ -59,7 +59,11 @@ var KEStatus = {
             obj = KEStatus.emptyList.pop();
             if(obj.parentNode.parentNode) {
                 if(obj.length == 1) {
-                    obj.parentNode.parentNode.removeChild(obj.parentNode);
+                    if(obj.parentNode.innerHTML.length > 0) {
+                        obj.parentNode.removeChild(obj);
+                    } else {
+                        obj.parentNode.parentNode.removeChild(obj.parentNode);
+                    }
                 } else if (obj.length > 1) {
                     var start = KEStatus.range.startOffset;
                     var end = KEStatus.range.endOffset;
