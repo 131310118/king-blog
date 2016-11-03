@@ -145,7 +145,7 @@ input:focus {
 .nav-list .search:hover {
     background-color: #222;
 }
-.search .fa-search {
+.search .search-icon {
     position: relative;
     left:-23px;
     cursor:pointer;
